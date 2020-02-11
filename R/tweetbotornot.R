@@ -91,10 +91,18 @@ botornot.character <- function(x, fast = FALSE) {
     if (fast){
       x <- rtweet::lookup_users(x)
     }else{
-      x <- rtweet::get_timelines(x, n = 100)
-  }
+      x <- for (i in seq_along(tmls)) {
+      x[[i]] <- get_timeline(x[i], n = 100)
+      if (i %% 100L == 0L) {
+        rl <- rate_limit("get_timeline")
+        Sys.sleep(as.numeric(rl$reset, "secs"))
+      }
+  ## print update message
+  cat(i, " ")
+    }
+    }
 botornot(x, fast = fast)
-}
+  }
 
 
 #' Esimated probability of being a bot
